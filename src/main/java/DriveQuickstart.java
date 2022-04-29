@@ -13,10 +13,7 @@ import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
@@ -28,13 +25,13 @@ public class DriveQuickstart {
     /** Global instance of the JSON factory. */
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     /** Directory to store authorization tokens for this application. */
-    private static final String TOKENS_DIRECTORY_PATH = "tokens";
+    private static final String TOKENS_DIRECTORY_PATH = "resources";
 
     /**
      * Global instance of the scopes required by this quickstart.
      * If modifying these scopes, delete your previously saved tokens/ folder.
      */
-    private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE_METADATA_READONLY);
+    private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE);
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
     /**
@@ -58,7 +55,7 @@ public class DriveQuickstart {
                 .setAccessType("offline")
                 .build();
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
-        Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("695023622635-a3dqjk79reblm73p29bo8of3aosn9gqp.apps.googleusercontent.com");
+        Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("695023622635-cq4mq9hmfd598jahj2r7ivhnq7egncno.apps.googleusercontent.com");
         //returns an authorized Credential object.
         return credential;
     }
@@ -70,21 +67,40 @@ public class DriveQuickstart {
                 .setApplicationName(APPLICATION_NAME)
                 .build();
 
-        // Print the names and IDs for up to 10 files.
+        // Filtra para encontrar las imágenes con la extensión jpeg.
         FileList result = service.files().list()
-                .setQ("mimeType='image/jpeg'")
-                .setPageSize(10)
+                .setQ("name contains 'imagenesBot' and mimeType = 'application/vnd.google-apps.folder'")
+                .setPageSize(100)
+                .setSpaces("drive")
                 .setFields("nextPageToken, files(id, name)")
                 .execute();
         List<File> files = result.getFiles();
+
         if (files == null || files.isEmpty()) {
             System.out.println("No files found.");
         } else {
+            String dirImagenes = null;
             System.out.println("Files:");
             for (File file : files) {
                 System.out.printf("%s (%s)\n", file.getName(), file.getId());
+                dirImagenes = file.getId();
+            }
+            // buscamos la imagen
+            FileList resultImagenes = service.files().list()
+                    .setQ("name contains 'bbyoda' and parents in '" + dirImagenes + "'")
+                    .setSpaces("drive")
+                    .setFields("nextPageToken, files(id, name)")
+                    .execute();
+            List<File> filesImagenes = resultImagenes.getFiles();
+            for (File file : filesImagenes) {
+                System.out.printf("Imagen: %s\n", file.getName());
+                // guardamos en el fichero imagenNueva.jpeg después de crearlo
+                OutputStream outputStream = new FileOutputStream("/home/dam1/IdeaProjects/PruebaAPI/src/main/resources/imagenNueva.jpeg");
+                service.files().get(file.getId())
+                        .executeMediaAndDownloadTo(outputStream);
+                outputStream.flush();
+                outputStream.close();
             }
         }
     }
 }
-// [END drive_quickstart]
