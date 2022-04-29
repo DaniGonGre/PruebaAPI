@@ -14,13 +14,20 @@ import discord4j.core.spec.MessageCreateSpec;
 
 public class Prueba {
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
+
         final String token = args[0];
         final DiscordClient client = DiscordClient.create(token);
         final GatewayDiscordClient gateway = client.login().block();
 
+        EmbedCreateSpec embed = EmbedCreateSpec.builder()
+                .title("Grogu")
+                .image("attachment://imagenNueva.jpeg")
+                .build();
+
         gateway.on(MessageCreateEvent.class).subscribe(event -> {
             final Message message = event.getMessage();
+
             if ("/imgDrive".equals(message.getContent())) {
                 final MessageChannel channel = message.getChannel().block();
 
@@ -32,12 +39,18 @@ public class Prueba {
                 }
 
                 channel.createMessage(MessageCreateSpec.builder()
-                        .addFile("imagenDrive.jpeg", fileAsInputStream)
+                        .addEmbed(embed)
+                        .addFile("/home/dam1/IdeaProjects/PruebaAPI/src/main/resources/imagenNueva.jpeg", fileAsInputStream)
                         .build()).subscribe();
             }
+
         });
 
         gateway.onDisconnect().block();
     }
 }
+
+
+
+
 
