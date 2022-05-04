@@ -28,7 +28,7 @@ public class Prueba {
         gateway.on(MessageCreateEvent.class).subscribe(event -> {
             final Message message = event.getMessage();
 
-            if ("/imgDrive".equals(message.getContent())) {
+            if ("!imgDrive".equals(message.getContent())) {
                 final MessageChannel channel = message.getChannel().block();
 
                 InputStream fileAsInputStream = null;
