@@ -18,20 +18,16 @@ import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
 
-/* class to demonstarte use of Drive files list API */
 public class DriveQuickstart {
-    /** Application name. */
+    /** Creamos una constante con el nombre de la aplicación. */
     private static final String APPLICATION_NAME = "Google Drive API Java Quickstart";
-    /** Global instance of the JSON factory. */
+    /** Creamos una constante para instanciar el JSON */
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    /** Directory to store authorization tokens for this application. */
+    /** Creamos una constante con el token de autorización para esta aplicación. */
     private static final String TOKENS_DIRECTORY_PATH = "resources";
-
-    /**
-     * Global instance of the scopes required by this quickstart.
-     * If modifying these scopes, delete your previously saved tokens/ folder.
-     */
+    /** Creamos una constante de tipo colección que contiene los permisos requeridos por la aplicación para entrar a drive*/
     private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE);
+    /** Creamos una constante que contiene la ruta del archivo de la credenciales */
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
     /**
@@ -41,14 +37,14 @@ public class DriveQuickstart {
      * @throws IOException If the credentials.json file cannot be found.
      */
     private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
-        // Load client secrets.
+        // Buscamos las credenciales del cliente, añadiendo la excepción por si no se encuentra el archivo.
         InputStream in = DriveQuickstart.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
         if (in == null) {
             throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
         }
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
-        // Build flow and trigger user authorization request.
+        // Muestra la solicitud de autorización al usuario
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
                 .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
@@ -56,18 +52,18 @@ public class DriveQuickstart {
                 .build();
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
         Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("695023622635-cq4mq9hmfd598jahj2r7ivhnq7egncno.apps.googleusercontent.com");
-        //returns an authorized Credential object.
+        // Devuelve la creencial que debemos añadir con anterioridad, la de la ID de clientes OAuth
         return credential;
     }
 
     public static void main(String... args) throws IOException, GeneralSecurityException {
-        // Build a new authorized API client service.
+
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
                 .setApplicationName(APPLICATION_NAME)
                 .build();
 
-        // Filtra para encontrar las imágenes con la extensión jpeg.
+        // Filtra para encontrar las imágenes que contengan 'imagenesBot'.
         FileList result = service.files().list()
                 .setQ("name contains 'imagenesBot' and mimeType = 'application/vnd.google-apps.folder'")
                 .setPageSize(100)
@@ -85,7 +81,7 @@ public class DriveQuickstart {
                 System.out.printf("%s (%s)\n", file.getName(), file.getId());
                 dirImagenes = file.getId();
             }
-            // buscamos la imagen
+            // Buscamos la imagen.
             FileList resultImagenes = service.files().list()
                     .setQ("name contains 'bbyoda' and parents in '" + dirImagenes + "'")
                     .setSpaces("drive")
@@ -94,7 +90,7 @@ public class DriveQuickstart {
             List<File> filesImagenes = resultImagenes.getFiles();
             for (File file : filesImagenes) {
                 System.out.printf("Imagen: %s\n", file.getName());
-                // guardamos en el fichero imagenNueva.jpeg después de crearlo
+                // Guardamos en el fichero imagenNueva.jpeg después de crearlo
                 OutputStream outputStream = new FileOutputStream("/home/dam1/IdeaProjects/PruebaAPI/src/main/resources/imagenNueva.jpeg");
                 service.files().get(file.getId())
                         .executeMediaAndDownloadTo(outputStream);
