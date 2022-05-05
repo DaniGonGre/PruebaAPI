@@ -70,6 +70,8 @@ public class DriveQuickstart {
                 .setSpaces("drive")
                 .setFields("nextPageToken, files(id, name)")
                 .execute();
+
+        // Creamos una lista que recoja los ficheros filtrados anteriormente
         List<File> files = result.getFiles();
 
         if (files == null || files.isEmpty()) {
@@ -79,8 +81,11 @@ public class DriveQuickstart {
             System.out.println("Files:");
             for (File file : files) {
                 System.out.printf("%s (%s)\n", file.getName(), file.getId());
+
+                // Recogemos el ID de la imágen en una variable para poder buscarla
                 dirImagenes = file.getId();
             }
+
             // Buscamos la imagen.
             FileList resultImagenes = service.files().list()
                     .setQ("name contains 'bbyoda' and parents in '" + dirImagenes + "'")
@@ -90,6 +95,7 @@ public class DriveQuickstart {
             List<File> filesImagenes = resultImagenes.getFiles();
             for (File file : filesImagenes) {
                 System.out.printf("Imagen: %s\n", file.getName());
+
                 // Guardamos en el fichero imagenNueva.jpeg después de crearlo
                 OutputStream outputStream = new FileOutputStream("/home/dam1/IdeaProjects/PruebaAPI/src/main/resources/imagenNueva.jpeg");
                 service.files().get(file.getId())

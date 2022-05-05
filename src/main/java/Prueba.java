@@ -20,6 +20,7 @@ public class Prueba {
         final DiscordClient client = DiscordClient.create(token);
         final GatewayDiscordClient gateway = client.login().block();
 
+        // Creamos el embed para la imágen
         EmbedCreateSpec embed = EmbedCreateSpec.builder()
                 .title("Grogu")
                 .image("attachment://imagenNueva.jpeg")
@@ -27,6 +28,11 @@ public class Prueba {
 
         gateway.on(MessageCreateEvent.class).subscribe(event -> {
             final Message message = event.getMessage();
+
+            /**
+             * El bot al recibir el comando "!imgDrive" insertará la imágen que
+             * anteriormente buscamos en Google  Drive y descargamos en un fichero nuevo
+             */
 
             if ("!imgDrive".equals(message.getContent())) {
                 final MessageChannel channel = message.getChannel().block();
