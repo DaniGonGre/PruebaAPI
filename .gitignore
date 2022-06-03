@@ -8,3 +8,4 @@ settings.gradle
 gradle-wrapper.jar
 gradle-wrapper.properties
 credentials.json
+resources

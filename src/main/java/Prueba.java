@@ -50,6 +50,11 @@ public class Prueba {
                         .build()).subscribe();
             }
 
+            /**
+             * El bot al recibir el comando "/pdf" mandará un archivo .pfg que
+             * hemos extraído de Google Drive y descargado en un fichero nuevo
+             */
+
             if ("/pdf".equals(message.getContent())) {
                 final MessageChannel channel = message.getChannel().block();
 
