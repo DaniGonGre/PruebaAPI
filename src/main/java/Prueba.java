@@ -50,6 +50,21 @@ public class Prueba {
                         .build()).subscribe();
             }
 
+            if ("/pdf".equals(message.getContent())) {
+                final MessageChannel channel = message.getChannel().block();
+
+                InputStream fileAsInputStream = null;
+                try {
+                    fileAsInputStream = new FileInputStream("/home/dam1/IdeaProjects/PruebaAPI/src/main/resources/googleDoc.pdf");
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                channel.createMessage(MessageCreateSpec.builder()
+                        .addFile("googleDoc.pdf", fileAsInputStream)
+                        .build()).subscribe();
+            }
+
         });
 
         gateway.onDisconnect().block();
