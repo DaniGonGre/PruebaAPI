@@ -50,6 +50,26 @@ public class Prueba {
                         .build()).subscribe();
             }
 
+            /**
+             * El bot al recibir el comando "/pdf" mandará un archivo .pfg que
+             * hemos extraído de Google Drive y descargado en un fichero nuevo
+             */
+
+            if ("/pdf".equals(message.getContent())) {
+                final MessageChannel channel = message.getChannel().block();
+
+                InputStream fileAsInputStream = null;
+                try {
+                    fileAsInputStream = new FileInputStream("/home/dam1/IdeaProjects/PruebaAPI/src/main/resources/googleDoc.pdf");
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                channel.createMessage(MessageCreateSpec.builder()
+                        .addFile("googleDoc.pdf", fileAsInputStream)
+                        .build()).subscribe();
+            }
+
         });
 
         gateway.onDisconnect().block();
